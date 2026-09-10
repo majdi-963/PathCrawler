@@ -1,0 +1,14 @@
+{
+  "threads": 10,
+  "timeout": 5,
+  "follow_redirects": true,
+  "recursive": false,
+  "depth": 1,
+  "extensions": [],
+  "status_codes": [200, 301, 302, 403],
+  "exclude_status": [],
+  "user_agent": "PathCrawler/1.0",
+  "headers": {},
+  "log_level": "INFO",
+  "delay": 0.0
+}
