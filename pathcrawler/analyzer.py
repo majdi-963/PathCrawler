@@ -24,7 +24,9 @@ def display_status(response: HTTPResponse) -> Optional[int]:
 class ResponseAnalyzer:
     """Classifies HTTP responses using status filters and a custom 404 baseline."""
 
-    def __init__(self, config: ScanConfig, baseline: Optional[HTTPResponse] = None) -> None:
+    def __init__(
+        self, config: ScanConfig, baseline: Optional[HTTPResponse] = None
+    ) -> None:
         self.config = config
         self.baseline = baseline
 

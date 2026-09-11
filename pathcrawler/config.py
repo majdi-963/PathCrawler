@@ -56,7 +56,9 @@ def load_config_file(path: Optional[str]) -> Dict[str, Any]:
     return data
 
 
-def build_scan_config(cli_values: Dict[str, Any], file_values: Optional[Dict[str, Any]] = None) -> ScanConfig:
+def build_scan_config(
+    cli_values: Dict[str, Any], file_values: Optional[Dict[str, Any]] = None
+) -> ScanConfig:
     """Merge defaults, JSON config, and CLI values into a validated ScanConfig."""
 
     merged: Dict[str, Any] = dict(DEFAULTS)
@@ -85,11 +87,15 @@ def build_scan_config(cli_values: Dict[str, Any], file_values: Optional[Dict[str
     depth = _int_range(merged.get("depth"), "depth", 0, 5)
     log_level = str(merged.get("log_level", "INFO")).upper()
     if log_level not in LOG_LEVELS:
-        raise ConfigurationError("Invalid log level. Use DEBUG, INFO, WARNING, or ERROR.")
+        raise ConfigurationError(
+            "Invalid log level. Use DEBUG, INFO, WARNING, or ERROR."
+        )
 
     extensions = _parse_extensions(merged.get("extensions", []))
     status_codes = _parse_status_codes(merged.get("status_codes", []), "status")
-    exclude_status = _parse_status_codes(merged.get("exclude_status", []), "exclude-status")
+    exclude_status = _parse_status_codes(
+        merged.get("exclude_status", []), "exclude-status"
+    )
     headers = _parse_headers(merged.get("headers", {}))
 
     return ScanConfig(
@@ -195,7 +201,9 @@ def _parse_headers(value: Any) -> dict[str, str]:
     elif isinstance(value, list):
         return parse_header_arguments([str(item) for item in value]) or {}
     else:
-        raise ConfigurationError("Headers must be an object or a list of 'Name: value' strings.")
+        raise ConfigurationError(
+            "Headers must be an object or a list of 'Name: value' strings."
+        )
     parsed: dict[str, str] = {}
     for name, header_value in headers.items():
         header_name = str(name).strip()
@@ -214,7 +222,9 @@ def _int_range(value: Any, name: str, minimum: int, maximum: int) -> int:
     except (TypeError, ValueError) as exc:
         raise ConfigurationError(f"Invalid {name}.") from exc
     if number < minimum or number > maximum:
-        raise ConfigurationError(f"Invalid {name}. Use a value from {minimum} to {maximum}.")
+        raise ConfigurationError(
+            f"Invalid {name}. Use a value from {minimum} to {maximum}."
+        )
     return number
 
 

@@ -20,7 +20,13 @@ from pathcrawler.analyzer import (
     ResponseAnalyzer,
 )
 from pathcrawler.http_client import HTTPClient, build_url
-from pathcrawler.models import HTTPResponse, ScanConfig, ScanResult, ScanStatistics, WordlistStats
+from pathcrawler.models import (
+    HTTPResponse,
+    ScanConfig,
+    ScanResult,
+    ScanStatistics,
+    WordlistStats,
+)
 from pathcrawler.wordlist import generate_paths, load_wordlist
 
 
@@ -39,7 +45,9 @@ class PathCrawlerScanner:
         self._last_request_time = 0.0
         self._scanned_paths: set[str] = set()
 
-    def scan(self) -> Tuple[List[ScanResult], ScanStatistics, WordlistStats, HTTPResponse]:
+    def scan(
+        self,
+    ) -> Tuple[List[ScanResult], ScanStatistics, WordlistStats, HTTPResponse]:
         """Run a full scan and return included results, statistics, wordlist stats, and baseline."""
 
         words, wordlist_stats = load_wordlist(self.config.wordlist_path)
@@ -62,11 +70,19 @@ class PathCrawlerScanner:
         for depth in range(max_depth + 1):
             prefixes_to_scan = current_prefixes
             current_prefixes = []
-            candidate_paths = self._new_paths(generate_paths(words, self.config.extensions, prefixes_to_scan[0])) if len(prefixes_to_scan) == 1 else []
+            candidate_paths = (
+                self._new_paths(
+                    generate_paths(words, self.config.extensions, prefixes_to_scan[0])
+                )
+                if len(prefixes_to_scan) == 1
+                else []
+            )
             if len(prefixes_to_scan) > 1:
                 all_paths: list[str] = []
                 for prefix in prefixes_to_scan:
-                    all_paths.extend(generate_paths(words, self.config.extensions, prefix))
+                    all_paths.extend(
+                        generate_paths(words, self.config.extensions, prefix)
+                    )
                 candidate_paths = self._new_paths(all_paths)
 
             if not candidate_paths:
@@ -91,9 +107,14 @@ class PathCrawlerScanner:
             for result in included_results
             if result.classification in {FOUND, FORBIDDEN, REDIRECT}
         )
-        stats.errors = max(stats.errors, sum(1 for result in included_results if result.classification == ERROR))
+        stats.errors = max(
+            stats.errors,
+            sum(1 for result in included_results if result.classification == ERROR),
+        )
         stats.false_positives = sum(
-            1 for result in included_results if result.classification == LIKELY_FALSE_POSITIVE
+            1
+            for result in included_results
+            if result.classification == LIKELY_FALSE_POSITIVE
         )
 
         return included_results, stats, wordlist_stats, baseline_response
@@ -107,14 +128,15 @@ class PathCrawlerScanner:
         results: List[ScanResult] = []
         with ThreadPoolExecutor(max_workers=self.config.threads) as executor:
             future_to_path = {
-                executor.submit(self._fetch_path, path, False): path
-                for path in paths
+                executor.submit(self._fetch_path, path, False): path for path in paths
             }
             for future in as_completed(future_to_path):
                 path = future_to_path[future]
                 try:
                     response = future.result()
-                except Exception as exc:  # Defensive guard for unexpected worker failures.
+                except (
+                    Exception
+                ) as exc:  # Defensive guard for unexpected worker failures.
                     logging.debug("Worker failed for %s", path, exc_info=True)
                     response = HTTPResponse(
                         url=build_url(self.config.target_url, path),
@@ -133,7 +155,9 @@ class PathCrawlerScanner:
 
     def _fetch_path(self, path: str, include_body: bool = False) -> HTTPResponse:
         self._respect_delay()
-        return self.client.get(build_url(self.config.target_url, path), include_body=include_body)
+        return self.client.get(
+            build_url(self.config.target_url, path), include_body=include_body
+        )
 
     def _respect_delay(self) -> None:
         if self.config.delay <= 0:
@@ -162,7 +186,9 @@ class PathCrawlerScanner:
         return True
 
     def _random_baseline_path(self) -> str:
-        suffix = "".join(random.choice(string.ascii_lowercase + string.digits) for _ in range(14))
+        suffix = "".join(
+            random.choice(string.ascii_lowercase + string.digits) for _ in range(14)
+        )
         return f"/pc-nonexistent-{suffix}"
 
 

@@ -17,7 +17,12 @@ from pathcrawler.config import (
 from pathcrawler.errors import ConfigurationError, PathCrawlerError
 from pathcrawler.logger import setup_logging
 from pathcrawler.models import VERSION
-from pathcrawler.reporter import print_banner, print_results, print_summary, write_report
+from pathcrawler.reporter import (
+    print_banner,
+    print_results,
+    print_summary,
+    write_report,
+)
 from pathcrawler.scanner import PathCrawlerScanner
 
 
@@ -90,22 +95,73 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     scan_parser.set_defaults(func=run_scan)
-    scan_parser.add_argument("--url", "-u", dest="target_url", help="Target base URL, for example http://127.0.0.1:8000")
-    scan_parser.add_argument("--wordlist", "-w", dest="wordlist_path", help="Path to wordlist file")
-    scan_parser.add_argument("--threads", "-t", type=int, help="Number of worker threads, 1 to 100 (default: 10)")
-    scan_parser.add_argument("--timeout", "-T", type=float, help="Request timeout in seconds (default: 5)")
-    scan_parser.add_argument("--extensions", "-e", help="Comma-separated extensions, for example php,html,txt,bak")
-    scan_parser.add_argument("--status", help="Comma-separated status codes to include, for example 200,301,302,403")
-    scan_parser.add_argument("--exclude-status", help="Comma-separated status codes to exclude, for example 404")
-    scan_parser.add_argument("--output", "-o", dest="output_path", help="Write report to .json or .csv file")
-    scan_parser.add_argument("--config", help="Load scan settings from a JSON configuration file")
-    scan_parser.add_argument("--recursive", "-r", action="store_true", default=None, help="Recursively scan discovered directory-like paths")
-    scan_parser.add_argument("--depth", type=int, help="Maximum recursion depth, 0 to 5 (default: 1)")
+    scan_parser.add_argument(
+        "--url",
+        "-u",
+        dest="target_url",
+        help="Target base URL, for example http://127.0.0.1:8000",
+    )
+    scan_parser.add_argument(
+        "--wordlist", "-w", dest="wordlist_path", help="Path to wordlist file"
+    )
+    scan_parser.add_argument(
+        "--threads",
+        "-t",
+        type=int,
+        help="Number of worker threads, 1 to 100 (default: 10)",
+    )
+    scan_parser.add_argument(
+        "--timeout", "-T", type=float, help="Request timeout in seconds (default: 5)"
+    )
+    scan_parser.add_argument(
+        "--extensions",
+        "-e",
+        help="Comma-separated extensions, for example php,html,txt,bak",
+    )
+    scan_parser.add_argument(
+        "--status",
+        help="Comma-separated status codes to include, for example 200,301,302,403",
+    )
+    scan_parser.add_argument(
+        "--exclude-status",
+        help="Comma-separated status codes to exclude, for example 404",
+    )
+    scan_parser.add_argument(
+        "--output", "-o", dest="output_path", help="Write report to .json or .csv file"
+    )
+    scan_parser.add_argument(
+        "--config", help="Load scan settings from a JSON configuration file"
+    )
+    scan_parser.add_argument(
+        "--recursive",
+        "-r",
+        action="store_true",
+        default=None,
+        help="Recursively scan discovered directory-like paths",
+    )
+    scan_parser.add_argument(
+        "--depth", type=int, help="Maximum recursion depth, 0 to 5 (default: 1)"
+    )
     scan_parser.add_argument("--user-agent", help="Custom User-Agent header")
-    scan_parser.add_argument("--header", action="append", help="Custom header, repeatable. Format: 'Name: value'")
-    scan_parser.add_argument("--log-level", choices=["DEBUG", "INFO", "WARNING", "ERROR"], help="Logging level")
-    scan_parser.add_argument("--no-follow-redirects", action="store_true", default=None, help="Record redirects without following them")
-    scan_parser.add_argument("--delay", type=float, help="Optional delay between requests in seconds")
+    scan_parser.add_argument(
+        "--header",
+        action="append",
+        help="Custom header, repeatable. Format: 'Name: value'",
+    )
+    scan_parser.add_argument(
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        help="Logging level",
+    )
+    scan_parser.add_argument(
+        "--no-follow-redirects",
+        action="store_true",
+        default=None,
+        help="Record redirects without following them",
+    )
+    scan_parser.add_argument(
+        "--delay", type=float, help="Optional delay between requests in seconds"
+    )
     return parser
 
 
@@ -125,7 +181,9 @@ def run_scan(args: argparse.Namespace) -> int:
 
     report_path = None
     if config.output_path:
-        report_path = write_report(config.output_path, config, stats, results, wordlist_stats)
+        report_path = write_report(
+            config.output_path, config, stats, results, wordlist_stats
+        )
     print_summary(stats, report_path)
     return 0
 
